@@ -3,9 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-from app.core.security import get_current_user
 from app.db.database import get_db
-from app.models.chat_message import ChatMessage
 from app.services.openai_service import create_embedding
 from app.services.chat_service import ask_openai
 
@@ -20,8 +18,7 @@ class QueryRequest(BaseModel):
 @router.post("/query")
 def query_documents(
     request: QueryRequest,
-    db: Session = Depends(get_db),
-    user: dict = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     question_embedding = create_embedding(request.question)
 
@@ -52,20 +49,12 @@ def query_documents(
         context=context
     )
 
-    chat_message = ChatMessage(
-        user_email=user.get("sub"),
-        question=request.question,
-        answer=answer
-    )
-
-    db.add(chat_message)
-    db.commit()
-
     sources = [
         {
             "chunk_id": row.id,
             "filename": row.filename,
             "page_number": row.page_number,
+            "content": row.content,
             "distance": float(row.distance)
         }
         for row in result
@@ -75,39 +64,4 @@ def query_documents(
         "question": request.question,
         "answer": answer,
         "sources": sources
-    }
-
-
-@router.get("/chat/history")
-def get_chat_history(
-    db: Session = Depends(get_db),
-    user: dict = Depends(get_current_user)
-):
-    messages = db.query(ChatMessage).filter(
-        ChatMessage.user_email == user.get("sub")
-    ).order_by(ChatMessage.id.desc()).limit(20).all()
-
-    return [
-        {
-            "id": item.id,
-            "question": item.question,
-            "answer": item.answer,
-            "created_at": item.created_at
-        }
-        for item in messages
-    ]
-
-@router.delete("/chat/history")
-def delete_chat_history(
-    db: Session = Depends(get_db),
-    user: dict = Depends(get_current_user)
-):
-    db.query(ChatMessage).filter(
-        ChatMessage.user_email == user.get("sub")
-    ).delete()
-
-    db.commit()
-
-    return {
-        "message": "Chat history deleted successfully"
     }

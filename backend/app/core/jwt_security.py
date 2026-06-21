@@ -1,5 +1,5 @@
 from jose import jwt, JWTError
-from fastapi import Header, HTTPException
+from fastapi import Header, HTTPException, Depends
 
 from app.core.config import settings
 

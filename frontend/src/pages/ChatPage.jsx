@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import api from "../api/api";
 
 function ChatPage({ token }) {
@@ -11,22 +11,6 @@ function ChatPage({ token }) {
     Authorization: `Bearer ${token}`,
   };
 
-  const loadHistory = async () => {
-    try {
-      const response = await api.get("/chat/history", {
-        headers: authHeaders,
-      });
-
-      setMessages(response.data.reverse());
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    loadHistory();
-  }, []);
-
   const askQuestion = async () => {
     if (!question.trim()) return;
 
@@ -36,8 +20,8 @@ function ChatPage({ token }) {
       ...prev,
       {
         question: currentQuestion,
-        answer: "Cevaplanıyor..."
-      }
+        answer: "Cevaplanıyor...",
+      },
     ]);
 
     setQuestion("");
@@ -57,21 +41,27 @@ function ChatPage({ token }) {
 
       setMessages((prev) => {
         const updated = [...prev];
+
         updated[updated.length - 1] = {
           question: response.data.question,
           answer: response.data.answer,
         };
+
         return updated;
       });
 
-      setSources(response.data.sources);
+      setSources(response.data.sources || []);
     } catch (error) {
+      console.error(error);
+
       setMessages((prev) => {
         const updated = [...prev];
+
         updated[updated.length - 1] = {
           question: currentQuestion,
           answer: "Bir hata oluştu.",
         };
+
         return updated;
       });
     } finally {
@@ -84,6 +74,12 @@ function ChatPage({ token }) {
       <h2>Soru Sor</h2>
 
       <div className="chat-box">
+        {messages.length === 0 && (
+          <p className="empty-text">
+            Bir belge hakkında soru sorarak başlayabilirsin.
+          </p>
+        )}
+
         {messages.map((message, index) => (
           <div className="chat-message" key={index}>
             <div className="user-message">
@@ -114,9 +110,13 @@ function ChatPage({ token }) {
           <h3>Son Cevabın Kaynakları</h3>
 
           {sources.map((source, index) => (
-            <div className="source" key={index}>
-              📄 {source.filename} — Sayfa {source.page_number}
-            </div>
+            <details className="source-preview" key={index}>
+              <summary>
+                📄 {source.filename} — Sayfa {source.page_number}
+              </summary>
+
+              <p>{source.content}</p>
+            </details>
           ))}
         </div>
       )}

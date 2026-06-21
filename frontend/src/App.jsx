@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import api from "./api/api";
 import "./App.css";
 
 import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
 import ChatPage from "./pages/ChatPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import LoginPage from "./pages/LoginPage";
@@ -24,26 +24,17 @@ function App() {
 
     setToken(accessToken);
     setRole(userRole);
-    setActivePage("chat");
+    setActivePage(userRole === "ADMIN" ? "dashboard" : "chat");
   };
 
-  const logout = async () => {
-    try {
-      await api.delete("/chat/history", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.error("Chat history could not be deleted", error);
-    }
-
+  const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
 
     setToken("");
     setRole("");
     setActivePage("chat");
+    setAuthPage("login");
   };
 
   return (
@@ -61,6 +52,17 @@ function App() {
 
           {token && (
             <nav className="nav">
+              {canManageUsers && (
+                <button
+                  className={
+                    activePage === "dashboard" ? "nav-item active" : "nav-item"
+                  }
+                  onClick={() => setActivePage("dashboard")}
+                >
+                  Dashboard
+                </button>
+              )}
+
               <button
                 className={activePage === "chat" ? "nav-item active" : "nav-item"}
                 onClick={() => setActivePage("chat")}
@@ -110,19 +112,21 @@ function App() {
           </div>
         </header>
 
-{!token ? (
-  authPage === "login" ? (
-    <LoginPage
-      onLogin={handleLogin}
-      onSwitch={() => setAuthPage("register")}
-    />
-  ) : (
-    <RegisterPage
-      onSwitch={() => setAuthPage("login")}
-    />
-  )
-) : (
+        {!token ? (
+          authPage === "login" ? (
+            <LoginPage
+              onLogin={handleLogin}
+              onSwitch={() => setAuthPage("register")}
+            />
+          ) : (
+            <RegisterPage onSwitch={() => setAuthPage("login")} />
+          )
+        ) : (
           <>
+            {activePage === "dashboard" && canManageUsers && (
+              <DashboardPage token={token} />
+            )}
+
             {activePage === "chat" && <ChatPage token={token} />}
 
             {activePage === "documents" && canManageDocuments && (

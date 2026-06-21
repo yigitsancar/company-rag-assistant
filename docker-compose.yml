@@ -10,6 +10,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
 
   backend:
     build:
@@ -23,6 +24,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend/uploads:/app/uploads
+    restart: unless-stopped
 
   frontend:
     build:
@@ -32,6 +34,7 @@ services:
       - backend
     ports:
       - "3000:80"
+    restart: unless-stopped
 
 volumes:
   postgres_data:
