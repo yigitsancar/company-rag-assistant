@@ -13,8 +13,7 @@ services:
     restart: unless-stopped
 
   backend:
-    build:
-      context: ./backend
+    image: yigitsancar/company-rag-backend:latest
     container_name: company-rag-backend
     env_file:
       - ./backend/.env
@@ -27,8 +26,7 @@ services:
     restart: unless-stopped
 
   frontend:
-    build:
-      context: ./frontend
+    image: yigitsancar/company-rag-frontend:latest
     container_name: company-rag-frontend
     depends_on:
       - backend
