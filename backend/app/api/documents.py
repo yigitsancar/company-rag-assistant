@@ -102,10 +102,11 @@ def upload_document(
 
 
 @router.delete("/documents/{document_id}")
+@router.delete("/documents/{document_id}")
 def delete_document(
     document_id: int,
     db: Session = Depends(get_db),
-    is_admin: bool = Depends(require_admin)
+    user: dict = Depends(require_manager_or_admin)
 ):
     document = db.query(Document).filter(Document.id == document_id).first()
 

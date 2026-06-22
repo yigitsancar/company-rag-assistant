@@ -1,207 +1,240 @@
-# Company RAG Assistant
+# Company RAG Platform
 
-AI-powered document assistant built with FastAPI, React, PostgreSQL, pgvector and OpenAI.
+Company RAG Platform is a full-stack AI-powered document question-answering platform.
+It allows users to upload company documents, ask natural language questions, and receive AI-generated answers based on the uploaded documents.
 
-## Overview
-
-Company RAG Assistant is a secure Retrieval-Augmented Generation (RAG) platform that allows company employees to upload internal documents and ask natural language questions about them.
-
-The system extracts document content, generates vector embeddings, stores them in PostgreSQL using pgvector, and retrieves the most relevant information to answer user queries.
+The project was developed as a production-ready MVP using FastAPI, React, PostgreSQL with pgvector, Docker, AWS EC2, Nginx, JWT authentication, and role-based access control.
 
 ---
 
 ## Features
 
-### Authentication & Authorization
+* User registration and login
+* JWT-based authentication
+* Role-based authorization
 
-* JWT Authentication
-* Secure Password Hashing
-* Role-Based Access Control (RBAC)
-
-Supported roles:
-
-| Role     | Permissions                                                 |
-| -------- | ----------------------------------------------------------- |
-| ADMIN    | Full access, user management, role management, delete users |
-| MANAGER  | Document management, employee management                    |
-| EMPLOYEE | Ask questions and access company knowledge                  |
-
----
-
-### Document Management
-
-* PDF Upload
-* PDF Text Extraction
-* Automatic Chunking
-* Vector Embedding Generation
-* Document Listing
-* Document Deletion
+  * ADMIN
+  * MANAGER
+  * EMPLOYEE
+* PDF document upload
+* PDF text extraction
+* Text chunking
+* OpenAI embedding generation
+* PostgreSQL + pgvector semantic search
+* RAG-based question answering
+* Source preview for retrieved document chunks
+* Admin dashboard
+* User management
+* Document management
+* Dockerized deployment
+* AWS EC2 deployment
+* Elastic IP configuration
+* Nginx reverse proxy
+* Docker auto restart
 
 ---
 
-### AI-Powered Question Answering
+## User Roles
 
-Users can ask questions in natural language:
+### ADMIN
 
-Examples:
+ADMIN users can:
 
-* What are Concurrency Patterns?
-* Explain the Observer Pattern.
-* What are the responsibilities of a Project Manager?
-* Summarize chapter 3.
-
-The system:
-
-1. Converts the question into an embedding.
-2. Searches similar document chunks using vector similarity.
-3. Retrieves the most relevant content.
-4. Generates an AI answer using OpenAI.
-
----
-
-### Chat History
-
-* User-specific chat history
-* Automatic history cleanup on logout
-* Persistent storage in PostgreSQL
-
----
-
-### User Management
-
-Admin users can:
-
-* View all users
+* Ask questions
+* Upload documents
+* List documents
+* Delete documents
+* View dashboard statistics
+* List users
 * Change user roles
 * Delete users
 
-Managers can:
+### MANAGER
 
-* View employees
-* Manage company documents
+MANAGER users can:
+
+* Ask questions
+* Upload documents
+* List documents
+* Delete documents
+
+### EMPLOYEE
+
+EMPLOYEE users can:
+
+* Ask questions based on uploaded documents
+
+---
+
+## Tech Stack
+
+### Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* pgvector
+* OpenAI API
+* JWT
+* Passlib / bcrypt
+* Uvicorn
+
+### Frontend
+
+* React
+* Vite
+* Axios
+* CSS
+
+### Infrastructure
+
+* Docker
+* Docker Compose v2
+* AWS EC2
+* Elastic IP
+* Nginx Reverse Proxy
+* Ubuntu Server
 
 ---
 
 ## System Architecture
 
 ```text
+User
+↓
 React Frontend
-      │
-      ▼
+↓
+Nginx Reverse Proxy
+↓
 FastAPI Backend
-      │
-      ├── JWT Authentication
-      ├── Role Management
-      ├── RAG Engine
-      │
-      ▼
+↓
 PostgreSQL + pgvector
-      │
-      ▼
-OpenAI Embeddings + GPT
+↓
+OpenAI Embeddings / Chat Completion
 ```
 
 ---
 
-## Technology Stack
+## RAG Pipeline
 
-### Frontend
-
-* React
-* Axios
-* Vite
-* CSS3
-
-### Backend
-
-* FastAPI
-* SQLAlchemy
-* Pydantic
-* Uvicorn
-
-### Database
-
-* PostgreSQL
-* pgvector
-
-### AI
-
-* OpenAI Embeddings
-* OpenAI Chat Models
-
-### Security
-
-* JWT
-* Passlib
-* Bcrypt
-
-### DevOps
-
-* Docker
-* Docker Compose
-* Git
-* GitHub
-
----
-
-## Database Schema
-
-### Users
+### Document Upload Flow
 
 ```text
-id
-email
-password
-role
-created_at
+PDF Upload
+↓
+Text Extraction
+↓
+Chunking
+↓
+Embedding Generation
+↓
+Vector Storage in PostgreSQL
 ```
 
-### Documents
+### Question Answering Flow
 
 ```text
-id
-filename
-created_at
-```
-
-### Chunks
-
-```text
-id
-document_id
-page_number
-content
-embedding
-```
-
-### Chat Messages
-
-```text
-id
-user_id
-question
-answer
-created_at
+User Question
+↓
+Question Embedding
+↓
+Similarity Search with pgvector
+↓
+Relevant Chunks Retrieved
+↓
+Context Sent to OpenAI
+↓
+Answer + Sources Returned
 ```
 
 ---
 
-## Running Locally
+## Database Tables
 
-### Clone Repository
+The project uses the following main tables:
+
+* `users`
+* `documents`
+* `chunks`
+* `chat_messages`
+
+### users
+
+Stores registered users and their roles.
+
+### documents
+
+Stores uploaded document metadata.
+
+### chunks
+
+Stores extracted document chunks and their vector embeddings.
+
+### chat_messages
+
+Prepared for storing question-answer history.
+
+---
+
+## Deployment
+
+The project is deployed on AWS EC2 using Docker Compose.
+
+### Running Containers
+
+```text
+company-rag-frontend
+company-rag-backend
+company-rag-postgres
+```
+
+### Public Access
+
+```text
+http://13.62.87.94
+```
+
+The application is served through Nginx reverse proxy.
+
+```text
+/      → Frontend
+/api/  → Backend
+```
+
+---
+
+## Docker Commands
+
+Start the project:
 
 ```bash
-git clone https://github.com/yigitsancar/company-rag-assistant.git
-cd company-rag-assistant
+docker compose up -d --build
 ```
 
-### Configure Environment
-
-Create:
+Stop the project:
 
 ```bash
-backend/.env
+docker compose down
 ```
+
+Check running containers:
+
+```bash
+docker ps
+```
+
+View backend logs:
+
+```bash
+docker logs company-rag-backend --tail=100
+```
+
+---
+
+## Environment Variables
+
+The backend requires a `.env` file.
 
 Example:
 
@@ -214,73 +247,50 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 ```
 
-### Start Application
-
-```bash
-docker compose up --build
-```
-
-Frontend:
-
-```text
-http://localhost:3000
-```
-
-Backend:
-
-```text
-http://localhost:8000
-```
-
-Swagger:
-
-```text
-http://localhost:8000/docs
-```
+The real `.env` file is not committed to GitHub.
 
 ---
 
 ## Current Status
 
-### Completed
+The MVP is completed and deployed.
+
+Completed features:
 
 * Authentication
 * Authorization
-* User Management
-* PDF Upload
-* Vector Database
-* Embeddings
-* Semantic Search
-* AI Question Answering
-* Chat History
-* Dockerization
+* Role management
+* Document upload
+* Document delete
+* Vector search
+* AI question answering
+* Source preview
+* Admin dashboard
+* Docker deployment
+* EC2 deployment
+* Nginx reverse proxy
+* Auto restart policy
 
-### Planned
+---
 
-* AWS Deployment
-* Domain & HTTPS
-* Hybrid Search (BM25 + Vector Search)
-* Local LLM Support (Ollama)
-* Conversation Memory
-* Re-ranking
-* Audit Logs
+## Future Improvements
+
+Possible future improvements:
+
+* HTTPS with SSL certificate
+* Custom domain
+* CI/CD with GitHub Actions
+* Audit logs
+* Better dashboard analytics
+* PDF preview
+* Local embedding model support
+* Local LLM support with Ollama
+* Advanced hybrid search
+* Reranking for better retrieval quality
 
 ---
 
 ## Author
 
-Yiğit Sancar
-
-Software Engineering Student
-
-Interested in:
-
-* Backend Development
-* DevOps
-* Cloud Computing
-* AI Systems
-* Retrieval-Augmented Generation (RAG)
-
-GitHub:
-
-https://github.com/yigitsancar
+Developed by Yiğit Sancar
+Final-year Software Engineering student
