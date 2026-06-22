@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from prometheus_fastapi_instrumentator import Instrumentator
 from app.api.dashboard import router as dashboard_router
 from app.api.users import router as users_router
 from app.api.health import router as health_router
@@ -36,3 +37,5 @@ app.include_router(query_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
+
+Instrumentator().instrument(app).expose(app)
