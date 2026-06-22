@@ -1,296 +1,315 @@
 # Company RAG Platform
 
-Company RAG Platform is a full-stack AI-powered document question-answering platform.
-It allows users to upload company documents, ask natural language questions, and receive AI-generated answers based on the uploaded documents.
+## AI-Powered Enterprise Knowledge Assistant
 
-The project was developed as a production-ready MVP using FastAPI, React, PostgreSQL with pgvector, Docker, AWS EC2, Nginx, JWT authentication, and role-based access control.
+Company RAG Platform is a production-oriented Retrieval-Augmented Generation (RAG) platform that enables organizations to upload internal PDF documents and interact with them through natural language queries.
 
----
-
-## Features
-
-* User registration and login
-* JWT-based authentication
-* Role-based authorization
-
-  * ADMIN
-  * MANAGER
-  * EMPLOYEE
-* PDF document upload
-* PDF text extraction
-* Text chunking
-* OpenAI embedding generation
-* PostgreSQL + pgvector semantic search
-* RAG-based question answering
-* Source preview for retrieved document chunks
-* Admin dashboard
-* User management
-* Document management
-* Dockerized deployment
-* AWS EC2 deployment
-* Elastic IP configuration
-* Nginx reverse proxy
-* Docker auto restart
+The platform combines modern AI technologies with a complete cloud deployment pipeline, allowing users to retrieve information from company documents through semantic search and AI-generated responses.
 
 ---
 
-## User Roles
+## Live Demo
 
-### ADMIN
+**Application**
 
-ADMIN users can:
-
-* Ask questions
-* Upload documents
-* List documents
-* Delete documents
-* View dashboard statistics
-* List users
-* Change user roles
-* Delete users
-
-### MANAGER
-
-MANAGER users can:
-
-* Ask questions
-* Upload documents
-* List documents
-* Delete documents
-
-### EMPLOYEE
-
-EMPLOYEE users can:
-
-* Ask questions based on uploaded documents
+https://rag.yigitsancar.com
 
 ---
 
-## Tech Stack
+## Screenshots
 
-### Backend
+### Login Page
 
-* Python
-* FastAPI
-* SQLAlchemy
-* PostgreSQL
-* pgvector
-* OpenAI API
-* JWT
-* Passlib / bcrypt
-* Uvicorn
+Secure JWT-based authentication and role-based access control.
 
-### Frontend
+![Login Page](screenshots/login.png)
 
-* React
-* Vite
-* Axios
-* CSS
+---
 
-### Infrastructure
+### Admin Dashboard
 
-* Docker
-* Docker Compose v2
-* AWS EC2
-* Elastic IP
-* Nginx Reverse Proxy
-* Ubuntu Server
+Real-time platform statistics including users, documents, chunks, and questions.
+
+![Dashboard](screenshots/dashboard.png)
+
+---
+
+### Document Management
+
+Upload, list, and manage company documents.
+
+![Documents](screenshots/documents.png)
+
+---
+
+### RAG Chat Interface
+
+Ask natural language questions and receive AI-generated answers based on uploaded documents.
+
+![Chat](screenshots/chat.png)
+
+---
+
+### Source Preview
+
+Every answer includes source references with document name, page number, and retrieved chunk content.
+
+![Sources](screenshots/sources.png)
+
+---
+
+### User Management
+
+Role-based user administration for ADMIN, MANAGER, and EMPLOYEE accounts.
+
+![Users](screenshots/users.png)
+
+---
+
+### Monitoring & Observability
+
+Grafana dashboard powered by Prometheus metrics collection.
+
+![Grafana](screenshots/grafana.png)
+
+---
+
+## Key Features
+
+### Authentication & Authorization
+
+* JWT Authentication
+* Secure Login & Registration
+* Role-Based Access Control (RBAC)
+
+Roles:
+
+* ADMIN
+* MANAGER
+* EMPLOYEE
+
+---
+
+### Document Management
+
+* PDF Upload
+* Document Listing
+* Document Deletion
+* Role-Based Permissions
+
+---
+
+### AI-Powered RAG Pipeline
+
+* PDF Text Extraction
+* Intelligent Chunking
+* OpenAI Embedding Generation
+* pgvector Semantic Search
+* Context Retrieval
+* OpenAI Answer Generation
+
+---
+
+### Source Grounding
+
+Each generated answer includes:
+
+* Document Name
+* Page Number
+* Retrieved Chunk Content
+
+---
+
+### Dashboard & Analytics
+
+Administrative dashboard provides:
+
+* Total Users
+* Total Documents
+* Total Chunks
+* Total Questions
+* Latest Documents
+* Latest Users
 
 ---
 
 ## System Architecture
 
 ```text
-User
-↓
-React Frontend
-↓
+Users
+  │
+  ▼
+Cloudflare DNS
+  │
+  ▼
 Nginx Reverse Proxy
-↓
-FastAPI Backend
-↓
+  │
+  ├── React Frontend
+  │
+  └── FastAPI Backend
+          │
+          ▼
 PostgreSQL + pgvector
-↓
-OpenAI Embeddings / Chat Completion
+          │
+          ▼
+OpenAI API
 ```
 
 ---
 
 ## RAG Pipeline
 
-### Document Upload Flow
+### Document Processing
 
 ```text
 PDF Upload
-↓
+    ↓
 Text Extraction
-↓
+    ↓
 Chunking
-↓
+    ↓
 Embedding Generation
-↓
-Vector Storage in PostgreSQL
+    ↓
+Vector Storage
 ```
 
-### Question Answering Flow
+### Question Answering
 
 ```text
-User Question
-↓
-Question Embedding
-↓
-Similarity Search with pgvector
-↓
-Relevant Chunks Retrieved
-↓
-Context Sent to OpenAI
-↓
-Answer + Sources Returned
+Question
+    ↓
+Embedding
+    ↓
+Similarity Search
+    ↓
+Relevant Chunks
+    ↓
+OpenAI Completion
+    ↓
+Answer + Sources
 ```
 
 ---
 
-## Database Tables
+## Monitoring & Observability
 
-The project uses the following main tables:
+### Prometheus
 
-* `users`
-* `documents`
-* `chunks`
-* `chat_messages`
+* Backend Metrics
+* Availability Monitoring
+* Resource Metrics
 
-### users
+### Grafana
 
-Stores registered users and their roles.
+* Total Requests
+* Requests Per Second
+* CPU Usage
+* Memory Usage
 
-### documents
+### Alerting
 
-Stores uploaded document metadata.
-
-### chunks
-
-Stores extracted document chunks and their vector embeddings.
-
-### chat_messages
-
-Prepared for storing question-answer history.
+Email notifications are automatically sent when backend availability issues are detected.
 
 ---
 
-## Deployment
-
-The project is deployed on AWS EC2 using Docker Compose.
-
-### Running Containers
+## CI/CD Pipeline
 
 ```text
-company-rag-frontend
-company-rag-backend
-company-rag-postgres
+GitHub Push
+      ↓
+GitHub Actions
+      ↓
+Build Backend Image
+      ↓
+Build Frontend Image
+      ↓
+Docker Hub Push
+      ↓
+SSH Deploy to EC2
+      ↓
+Docker Compose Pull
+      ↓
+Health Checks
+      ↓
+Production Deployment
 ```
 
-### Public Access
+Deployment health checks validate:
+
+* /api/docs
+* Authentication endpoint
+
+---
+
+## Technology Stack
+
+### Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* JWT Authentication
+
+### Frontend
+
+* React
+* Vite
+* Axios
+
+### Database
+
+* PostgreSQL
+* pgvector
+
+### AI
+
+* OpenAI Embeddings
+* OpenAI Chat Completions
+
+### Infrastructure
+
+* Docker
+* Docker Compose
+* GitHub Actions
+* Docker Hub
+* AWS EC2
+* Nginx
+* Cloudflare
+* Let's Encrypt SSL
+
+### Monitoring
+
+* Prometheus
+* Grafana
+* Email Alerting
+
+---
+
+## Project Structure
 
 ```text
-http://13.62.87.94
+company-rag-assistant
+├── backend
+├── frontend
+├── screenshots
+├── monitoring
+├── grafana
+├── docker-compose.yml
+└── README.md
 ```
-
-The application is served through Nginx reverse proxy.
-
-```text
-/      → Frontend
-/api/  → Backend
-```
-
----
-
-## Docker Commands
-
-Start the project:
-
-```bash
-docker compose up -d --build
-```
-
-Stop the project:
-
-```bash
-docker compose down
-```
-
-Check running containers:
-
-```bash
-docker ps
-```
-
-View backend logs:
-
-```bash
-docker logs company-rag-backend --tail=100
-```
-
----
-
-## Environment Variables
-
-The backend requires a `.env` file.
-
-Example:
-
-```env
-DATABASE_URL=postgresql://postgres:postgres@postgres:5432/companyrag
-OPENAI_API_KEY=your_openai_api_key
-ADMIN_API_KEY=your_admin_api_key
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-```
-
-The real `.env` file is not committed to GitHub.
-
----
-
-## Current Status
-
-The MVP is completed and deployed.
-
-Completed features:
-
-* Authentication
-* Authorization
-* Role management
-* Document upload
-* Document delete
-* Vector search
-* AI question answering
-* Source preview
-* Admin dashboard
-* Docker deployment
-* EC2 deployment
-* Nginx reverse proxy
-* Auto restart policy
-
----
-
-## Future Improvements
-
-Possible future improvements:
-
-* HTTPS with SSL certificate
-* Custom domain
-* CI/CD with GitHub Actions
-* Audit logs
-* Better dashboard analytics
-* PDF preview
-* Local embedding model support
-* Local LLM support with Ollama
-* Advanced hybrid search
-* Reranking for better retrieval quality
 
 ---
 
 ## Author
 
-Developed by Yiğit Sancar
-Final-year Software Engineering student
+**Yiğit Sancar**
+
+Software Engineering Student
+
+Interested in:
+
+* Backend Development
+* DevOps
+* Cloud Computing
+* AI Engineering
+* Kubernetes
